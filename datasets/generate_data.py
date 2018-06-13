@@ -13,6 +13,7 @@ from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
 
 import matplotlib
+
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
@@ -21,8 +22,10 @@ from text import text_to_sequence
 from utils import makedirs, remove_file, warning
 from audio import load_audio, spectrogram, melspectrogram, frames_to_hours
 
+
 def one(x=None):
     return 1
+
 
 def build_from_path(config):
     warning("Sampling rate: {}".format(hparams.sample_rate))
@@ -52,7 +55,7 @@ def build_from_path(config):
     new_info = {}
     for path in info.keys():
         if not os.path.exists(path):
-            new_path = os.path.join(base_dir, path)
+            new_path = os.path.join(os.path.join(base_dir, 'data'), path)
             if not os.path.exists(new_path):
                 print(" [!] Audio not found: {}".format([path, new_path]))
                 continue
@@ -78,8 +81,8 @@ def build_from_path(config):
     }
 
     print(" [!] Skip recognition level: {} ({})". \
-            format(hparams.ignore_recognition_level,
-                   ignore_description[hparams.ignore_recognition_level]))
+          format(hparams.ignore_recognition_level,
+                 ignore_description[hparams.ignore_recognition_level]))
 
     for audio_path, text in info.items():
         if hparams.ignore_recognition_level > 0 and loss_coeff[audio_path] != 1:
@@ -94,8 +97,8 @@ def build_from_path(config):
             continue
 
         fn = partial(
-                _process_utterance,
-                audio_path, data_dir, tokens, loss_coeff[audio_path])
+            _process_utterance,
+            audio_path, data_dir, tokens, loss_coeff[audio_path])
         futures.append(executor.submit(fn))
 
     n_frames = [future.result() for future in tqdm(futures)]
@@ -108,7 +111,7 @@ def build_from_path(config):
     print(' [*] Min length: {}'.format(min(n_frames)))
 
     plot_n_frames(n_frames, os.path.join(
-            base_dir, "n_frames_before_filter.png"))
+        base_dir, "n_frames_before_filter.png"))
 
     min_n_frame = hparams.reduction_factor * hparams.min_iters
     max_n_frame = hparams.reduction_factor * hparams.max_iters - hparams.reduction_factor
@@ -121,7 +124,8 @@ def build_from_path(config):
     print(' [*] Min length: {}'.format(min(n_frames)))
 
     plot_n_frames(n_frames, os.path.join(
-            base_dir, "n_frames_after_filter.png"))
+        base_dir, "n_frames_after_filter.png"))
+
 
 def plot_n_frames(n_frames, path):
     labels, values = list(zip(*Counter(n_frames).most_common()))
@@ -180,11 +184,12 @@ def _process_utterance(audio_path, data_dir, tokens, loss_coeff):
 
     return n_frame
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='spectrogram')
 
     parser.add_argument('metadata_path', type=str, default="./chinesedata/metadata.csv")
-    parser.add_argument('--data_dirname', type=str, default="data")
+    parser.add_argument('--data_dirname', type=str, default="traindata")
     parser.add_argument('--num_workers', type=int, default=None)
 
     config = parser.parse_args()
