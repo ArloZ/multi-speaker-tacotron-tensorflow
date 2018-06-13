@@ -34,7 +34,8 @@ def build_from_path(config):
     futures = []
     index = 1
 
-    base_dir = os.path.dirname(config.metadata_path)
+    base_dir = config.base_dir
+    metadata_base_dir = os.path.dirname(config.metadata_path)
     data_dir = os.path.join(base_dir, config.data_dirname)
     makedirs(data_dir)
 
@@ -55,7 +56,7 @@ def build_from_path(config):
     new_info = {}
     for path in info.keys():
         if not os.path.exists(path):
-            new_path = os.path.join(os.path.join(base_dir, 'data'), path)
+            new_path = os.path.join(os.path.join(metadata_base_dir, 'data'), path)
             if not os.path.exists(new_path):
                 print(" [!] Audio not found: {}".format([path, new_path]))
                 continue
@@ -188,6 +189,7 @@ def _process_utterance(audio_path, data_dir, tokens, loss_coeff):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='spectrogram')
 
+    parser.add_argument('--base_dir', type=str, default="./")
     parser.add_argument('--metadata_path', type=str, default="./chinesedata/metadata.csv")
     parser.add_argument('--data_dirname', type=str, default="traindata")
     parser.add_argument('--num_workers', type=int, default=None)
