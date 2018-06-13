@@ -188,7 +188,7 @@ def _process_utterance(audio_path, data_dir, tokens, loss_coeff):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='spectrogram')
 
-    parser.add_argument('metadata_path', type=str, default="./chinesedata/metadata.csv")
+    parser.add_argument('--metadata_path', type=str, default="./chinesedata/metadata.csv")
     parser.add_argument('--data_dirname', type=str, default="traindata")
     parser.add_argument('--num_workers', type=int, default=None)
 
